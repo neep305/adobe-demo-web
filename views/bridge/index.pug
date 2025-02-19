@@ -1,0 +1,57 @@
+extends ../layout_default 
+
+block content 
+    //- main.vh-100.d-flex.flex-column(role="main")
+    div(style="margin:auto;")
+        section.text-center
+            img.img_fluid(src="./images/singular-labs.png" alt="singular logo" width="70%" height="70%")
+        section.d-flex.flex-column.p-2
+            button.btn.btn-primary#btnMoveToApp
+                | 모바일 앱으로 이동(테스트앱)
+            button.btn.btn-info.mt-3#btnMoveToWeb 
+                | 모바일 웹으로 이동
+            button.btn.btn-success.mt-3#btnMoveToAppInParents
+                | 모바일 앱으로 이동(부모창)
+            button.btn.btn-warning.mt-3#btnCallSng 
+                | 모바일 앱으로 이동(티몬테스트)
+            .input-group.mt-3
+                .input-group-prepend 
+                    span.input-group-text#basic-addon1
+                        | scheme
+                input.form-control#deeplinkValue(type="text" placeholder="Deep Link Scheme" aria-label="Deep Link" aria-describedby="basic-addon1")
+            button.btn.btn-primary.mt-3#btnDirectDeepLink
+                | Call Scheme
+        //iframe#singFrame(src="", frameborder="1" width="100" height="50") 
+block append-script
+    script.
+        $(() => {
+            initSingularSdk();
+
+            $('#btnMoveToApp').on('click', (e) => {
+                e.preventDefault();
+                openAppWithPcn($(document)[0].location.search);
+            });
+
+            $('#btnMoveToWeb').on('click', (e) => {
+                e.preventDefault();
+                console.log('Not implemented yet');
+            });
+
+            $('#btnMoveToAppInParents').on('click', (e) => {
+                e.preventDefault();
+                //callPixelTag($(document)[0].location.search);
+                //callS2S();
+                callWindowsOpen($(document)[0].location.search);
+            });
+
+            $('#btnCallSng').on('click', (e) => {
+                e.preventDefault();
+                callSngWindowsOpen($(document)[0].location.search);
+            });
+
+            $('#deeplinkValue').val("jasonapp://dl_landing");
+            $('#btnDirectDeepLink').on('click', (e) => {
+                e.preventDefault();
+                callDeepLink($('#deeplinkValue').val());
+            });
+        });

@@ -1,0 +1,53 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+    meta(http-equiv="X-UA-Compatible" content="IE=11;FF=3;OtherUA=4")
+    title= title
+    link(href='/static/bootstrap/dist/css/bootstrap.min.css', rel='stylesheet', integrity='sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T', crossorigin='anonymous')
+    link(href='/static/font-awesome/css/font-awesome.min.css', rel='stylesheet')
+    
+  body.vh-100.m-0.d-flex.flex-column.text-center
+    header 
+      .navbar.navbar-dark.bg-danger.shadow-sm
+        .container
+          a.navbar-brand.d-flex.align-items-center(href='/')
+            
+            i.fas.fa-ad
+            
+            strong.m1-1 
+              | &nbsp;Jason Demo web (Adobe)
+          button.navbar-toggler(type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation")
+            span.navbar-toggler-icon
+          .collapse.navbar-collapse#navbarsExampleDefault 
+            ul.navbar-nav.mr-auto
+              li.nav-item.active
+                a.nav-link(href="/") Home 
+                  span.sr-only (current)
+              li.nav-item
+                a.nav-link(href="/webtoapp") Web To App
+              li.nav-item
+                a.nav-link(href="/gtm") GTM Singular Event
+              li.nav-item
+                a.nav-link(href="/events") JS Interface Test
+              li.nav-item
+                a.nav-link(href="/bridge") Bridge
+              li.nav-item
+                a.nav-link(href="/ga") GA4
+              li.nav-item
+                a.nav-link(href="/mixpanel") Mixpanel
+    block content
+      //div.container-fluid.d-flex.flex-column
+        //block content
+    footer.footer.py-3.bg-danger.mt-auto
+      .container
+        a.text-white.float-right(href='#') Back to top
+        p.m-0.text-center.text-white Copyright © Jason Nam 2025
+    script(src='/static/jquery/dist/jquery.min.js')
+    script(src='/static/bootstrap/dist/js/bootstrap.bundle.min.js', integrity='sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o', crossorigin='anonymous')
+    script(src='/static/bootstrap/js/dist/util.js')
+    script(src='/static/axios/dist/axios.js')
+    script(src='https://kit.fontawesome.com/b79cbf5f50.js', crossorigin="anonymous")
+    script(src='/javascripts/bundle.js')
+    block append-script

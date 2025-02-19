@@ -1,0 +1,80 @@
+extends layout_default
+
+block content
+  div(style="margin:auto;")
+    section.text-center
+      img.img_fluid(src="./images/adobe.png" alt="adobe logo" width="70%" height="70%")
+    section.d-flex.justify-content-center
+      span.font-weight-bold
+        | SDID
+    section.d-flex.justify-content-center
+      span.form-text#sdidArea
+        | No SDID
+    section.d-flex.justify-content-center.mt-1
+      span.font-weight-bold
+        | MatchID
+    section.d-flex.justify-content-center
+      span.form-text#matchIdArea
+        | No MatchID
+    section.d-flex.justify-content-center.mt-1
+      span.font-weight-bold
+        | Custom User ID        
+    section.d-flex.justify-content-center
+      input.form-control#customUserIdField(type="text" placeholder="Custom User ID" aria-label="customUserId")
+    section.d-flex.justify-content-center.mt-1
+      p.font-weight-bold
+        | Events for the test
+    section.d-flex.justify-content-center.mt-1
+      button.btn.btn-outline-primary#btnCreateAdobeDataLayer
+        | Create Adobe Data Layer
+    section.d-flex.justify-content-center.mt-1
+      button.btn.btn-outline-primary#btnAddtoCartEvent
+        | Web Add to Cart Event
+    section.d-flex.justify-content-center.mt-1
+      button.btn.btn-outline-primary#btnPurchaseItemEvent
+        | Web Purchase Event
+    section.d-flex.justify-content-center.mt-1
+      button.btn.btn-outline-primary#btnWebToApp
+        | Run Web-to-App
+    section.d-flex.justify-content-center.mt-1
+      button.btn.btn-outline-primary#btnBuildWebToApp
+        | Build Web-to-App Link
+block append-script
+  script.
+    $(() => {
+      
+      //- $('#sdidArea').text(singularSdk.getSingularDeviceId());
+      //$('#customUserIdField').val('973157');
+      
+      //- $('#matchIdArea').text(singularSdk.getMatchID());
+      
+      // Web Login Event
+      $('#btnCreateAdobeDataLayer').on('click', (e) => {
+        e.preventDefault();
+        window.adobeDataLayer.push({
+          event: 'adobeDataLayer.create',
+          data: {
+            adobeDataLayer: {
+              name: 'adobeDataLayer'
+            }
+          }
+        });
+        
+      });
+      // Web Add to cart Event
+      $('#btnAddtoCartEvent').on('click', (e) => {
+        e.preventDefault();
+      });
+      // Web Purchase Event
+      $('#btnPurchaseItemEvent').on('click', (e) => {
+        e.preventDefault();
+      });
+
+      $('#btnWebToApp').on('click', (e) => {
+        e.preventDefault();
+      });
+      $('#btnBuildWebToApp').on('click', (e) => {
+        e.preventDefault();
+        e.target.blur();
+      });
+    });

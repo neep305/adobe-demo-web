@@ -1,0 +1,20 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.btn-gradient-primary {
+  background: linear-gradient(to right, #4facfe, #fe00c3);
+}
+
+.btn-gradient-secondary {
+  background: linear-gradient(to right, #0046be, #667bff);
+}
+
+.btn-gradient-success {
+  background: linear-gradient(to right, #21d4fd, #b721ff);
+}

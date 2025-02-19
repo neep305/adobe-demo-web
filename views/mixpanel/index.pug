@@ -1,0 +1,44 @@
+extends ../layout_default 
+
+block content 
+    main.vh-100.d-flex.flex-column(role="main")
+        div(style="margin:auto;")
+            section.text-center
+                img.img_fluid(src="./images/mixpanel.png" alt="mixpanel logo" width="50%" height="50%")
+            section.d-flex.flex-column.p-2
+                button.btn.btn-primary#btnSignup
+                    | Signup
+                button.btn.btn-info.mt-3#btnAddToCart
+                    | Add to cart
+                button.btn.btn-success.mt-3#btnProductView
+                    | Product View
+                button.btn.btn-warning.mt-3#btnPurchaseItem 
+                    | Purchase an item
+block append-script
+    script.
+        $(() => {
+            initSingularSdk();
+
+            $('#btnSignup').on('click', (e) => {
+                e.preventDefault();
+                openAppWithPcn($(document)[0].location.search);
+            });
+
+            $('#btnAddToCart').on('click', (e) => {
+                e.preventDefault();
+                console.log('Not implemented yet');
+            });
+
+            $('#btnProductView').on('click', (e) => {
+                e.preventDefault();
+                //callPixelTag($(document)[0].location.search);
+                //callS2S();
+                callWindowsOpen($(document)[0].location.search);
+            });
+
+            $('#btnPurchaseItem').on('click', (e) => {
+                e.preventDefault();
+                callSngWindowsOpen($(document)[0].location.search);
+
+            });
+        });

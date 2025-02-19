@@ -1,0 +1,30 @@
+extends ../layout_default
+
+block content    
+    main.vh-100.d-flex.flex-column(role="main")
+        div(style="margin:auto;")
+            section.text-center
+                img.img_fluid(src="./images/ga_logo.png" alt="ga logo" width="40%" height="40%")
+            section.d-flex.justify-content-center
+                p.font-weight-bold
+                    | GA4 Ecommerce Test
+            section.d-flex.flex-column.p-2
+                button.btn.btn-primary#btnGotoGaEvent
+                    | GA이벤트 가기
+                button.btn.btn-info.mt-3#btnGotoGaEcommerce
+                    | GA전자상거래 가기
+block append-script
+    script.
+        $(() => {
+            initSingularSdk();
+
+            $('#btnGotoGaEvent').on('click', (e) => {
+                e.preventDefault();
+                window.location.href = '/ga/event'
+            });
+
+            $('#btnGotoGaEcommerce').on('click', (e) => {
+                e.preventDefault();
+                window.location.href = '/ga/ecommerce'
+            });
+        });

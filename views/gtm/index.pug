@@ -1,0 +1,85 @@
+extends ../layout_default
+
+block content    
+    main.vh-100.d-flex.flex-column(role="main")
+        div(style="margin:auto;")
+            section.d-flex.justify-content-center
+                img.img_fluid(src="./images/gtm.png" alt="singular logo" width="30%" height="30%")
+            section.d-flex.flex-column.p-2
+                button.btn.btn-primary#btnWebToApp.mb-2
+                    i.fas.fa-rocket
+                        | &nbsp;Web-to-app via GTM
+                .input-group.mb-2
+                    .input-group-prepend 
+                        span.input-group-text#basic-addon1
+                            | Event
+                    input.form-control#eventValue(type="text" placeholder="Event Name" aria-label="Event Name" aria-describedby="basic-addon1")
+                .input-group.mb-2
+                    .input-group-prepend
+                        input#cbRevenue.mr-2(type="checkbox" value="revenue")    
+                        span.text-primary
+                            | Set event-type to Revenue event
+                button.btn.btn-outline-secondary#btnSendEvent.mb-2
+                    | Send Singular Event
+                .input-group.mb-2
+                    .input-group-prepend 
+                        span.input-group-text#text-user-id
+                            | User ID
+                    input.form-control#user-id-value(type="text" placeholder="User ID" aria-label="User ID" aria-describedby="text-user-id")
+                .btn-group
+                    button.btn.btn-outline-primary.mr-2#btnLogin 
+                        | Login
+                    button.btn.btn-outline-danger#btnLogout 
+                        | Logout
+block append-script 
+    script.
+        $(() => {
+            // Web To App by GTM
+            $('#btnWebToApp').on('click', (e) => {
+                e.preventDefault();
+                dataLayer.push({
+                    'event': 'webtoapp',
+                    'link': 'https://seteam.sng.link/Afi47/pzd4?_dl=jasonapp%3A%2F%2Fdl_landing&_smtype=3'
+                });
+            });
+
+            $('#btnSendEvent').on('click', (e) => {
+                e.preventDefault();
+                const _eventName = $('#eventValue').val() || 'no_event';
+
+                if (_eventName == 'no_event') return;
+                dataLayer.push({
+                    'event': "singular_event",
+                    'singular_event_name': _eventName,
+                    'user_id': 'jason.nam1234',
+                    'order_id': '8809e37c-73a6-4618-9c03-7990a32f2aa6'
+                });
+            });
+            $('#btnLogin').on('click', (e) => {
+                e.preventDefault();
+                //- TODO: check if user_id is empty
+                if ($('#user-id-value').val() == '') {
+                    $('.alert').remove();
+                    $('.btn-group').before(`
+                        <div class="alert alert-warning alert-dismissible fade show mb-2" role="alert">
+                            사용자 ID를 입력해주세요.
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    `);
+                    return;
+                }
+                dataLayer.push({
+                    'event': 'singular_login',
+                    'user_id': $('#user-id-value').val()
+                });
+            });
+            $('#btnLogout').on('click', (e) => {
+                e.preventDefault();
+                dataLayer.push({
+                    'event': 'singular_logout',
+                    'user_id': $('#user-id-value').val()
+                });
+            });
+        });

@@ -1,0 +1,32 @@
+extends ../../layout_default
+
+block content    
+    main.vh-100.d-flex.flex-column(role="main")
+        div(style="margin:auto;")
+            section.d-flex.justify-content-center
+                img.img_fluid(src="../../images/gtm.png" alt="singular logo" width="50%" height="50%")
+            section.d-flex.flex-column.p-2
+                span 
+                    | Sign up    
+            section.d-flex.flex-column.p-2
+                .input-group.mb-2
+                    .input-group-prepend 
+                        span.input-group-text#basic-addon1
+                            | Event
+                    input.form-control#eventValue(type="text" placeholder="Event Name" aria-label="Event Name" aria-describedby="basic-addon1")
+                button.btn.btn-outline-secondary#btnSendEvent
+                    | Send Event to GTM
+            
+block append-script 
+    script.
+        $(() => {
+            $('#btnSendEvent').on('click', (e) => {
+                e.preventDefault();
+                const _eventName = $('#eventValue').val() || 'no_event';
+                dataLayer.push({
+                    'event': _eventName,
+                    'user_id': 'jason.nam1234',
+                    'order_id': '8809e37c-73a6-4618-9c03-7990a32f2aa6'
+                });
+            });
+        });
