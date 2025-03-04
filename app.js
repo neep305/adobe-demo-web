@@ -6,11 +6,8 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var eventsRouter = require('./routes/events');
-var bridgeRouter = require('./routes/bridge');
 var postbackRouter = require('./routes/postback');
 var mixpanelRouter = require('./routes/mixpanel');
-var webtoappRouter = require('./routes/webtoapp');
 var encryptRouter = require('./routes/encrypt');
 
 var app = express();
@@ -33,11 +30,8 @@ app.use((req, res, next) => {
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/events', eventsRouter);
-app.use('/bridge', bridgeRouter);
 app.use('/postback', postbackRouter);
 app.use('/mixpanel', mixpanelRouter);
-app.use('/webtoapp', webtoappRouter);
 app.use('/encrypt', encryptRouter);
 
 // catch 404 and forward to error handler

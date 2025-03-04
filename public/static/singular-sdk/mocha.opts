@@ -1,3 +1,0 @@
---require @babel/register
---require mock-local-storage
---require jsdom-global/register

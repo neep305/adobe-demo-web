@@ -6,75 +6,41 @@ block content
       img.img_fluid(src="./images/adobe.png" alt="adobe logo" width="70%" height="70%")
     section.d-flex.justify-content-center
       span.font-weight-bold
-        | SDID
+        | ECID
     section.d-flex.justify-content-center
-      span.form-text#sdidArea
-        | No SDID
+      input.form-control#customUserIdField(type="text" placeholder="ECID" aria-label="ECID")
     section.d-flex.justify-content-center.mt-1
-      span.font-weight-bold
-        | MatchID
-    section.d-flex.justify-content-center
-      span.form-text#matchIdArea
-        | No MatchID
+      p.font-weight-bold.mb-0
+        | Send Events
     section.d-flex.justify-content-center.mt-1
-      span.font-weight-bold
-        | Custom User ID        
-    section.d-flex.justify-content-center
-      input.form-control#customUserIdField(type="text" placeholder="Custom User ID" aria-label="customUserId")
+      button.btn.btn-outline-danger#btnSendEvent
+        | Send Event
     section.d-flex.justify-content-center.mt-1
-      p.font-weight-bold
-        | Events for the test
+      p.font-weight-bold.mb-0
+        | Send Web Details
     section.d-flex.justify-content-center.mt-1
-      button.btn.btn-outline-primary#btnCreateAdobeDataLayer
-        | Create Adobe Data Layer
-    section.d-flex.justify-content-center.mt-1
-      button.btn.btn-outline-primary#btnAddtoCartEvent
-        | Web Add to Cart Event
-    section.d-flex.justify-content-center.mt-1
-      button.btn.btn-outline-primary#btnPurchaseItemEvent
-        | Web Purchase Event
-    section.d-flex.justify-content-center.mt-1
-      button.btn.btn-outline-primary#btnWebToApp
-        | Run Web-to-App
-    section.d-flex.justify-content-center.mt-1
-      button.btn.btn-outline-primary#btnBuildWebToApp
-        | Build Web-to-App Link
+      button.btn.btn-outline-danger#btnSendWebDetails
+        | Send Web Details
 block append-script
   script.
     $(() => {
-      
-      //- $('#sdidArea').text(singularSdk.getSingularDeviceId());
-      //$('#customUserIdField').val('973157');
-      
-      //- $('#matchIdArea').text(singularSdk.getMatchID());
-      
-      // Web Login Event
-      $('#btnCreateAdobeDataLayer').on('click', (e) => {
+
+      console.log('edgeConfigId', "#{edgeConfigId}");
+      console.log('orgId', "#{orgId}");
+      var edgeConfigId = "#{edgeConfigId}";
+      var orgId = "#{orgId}";
+
+      window.__alloyCall.configureAlloy(edgeConfigId, orgId);
+      // Send Event
+      $('#btnSendEvent').on('click', (e) => {
         e.preventDefault();
-        window.adobeDataLayer.push({
-          event: 'adobeDataLayer.create',
-          data: {
-            adobeDataLayer: {
-              name: 'adobeDataLayer'
-            }
-          }
-        });
         
-      });
-      // Web Add to cart Event
-      $('#btnAddtoCartEvent').on('click', (e) => {
-        e.preventDefault();
-      });
-      // Web Purchase Event
-      $('#btnPurchaseItemEvent').on('click', (e) => {
-        e.preventDefault();
+        window.__alloyCall.sendCustomEvent('customEvent', "#{pageName}");
       });
 
-      $('#btnWebToApp').on('click', (e) => {
+      // Web Login Event
+      $('#btnSendWebDetails').on('click', (e) => {
         e.preventDefault();
-      });
-      $('#btnBuildWebToApp').on('click', (e) => {
-        e.preventDefault();
-        e.target.blur();
+        window.__alloyCall.sendPageView("#{pageName}");
       });
     });

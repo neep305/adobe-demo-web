@@ -1,6 +1,5 @@
 {
   "presets": ["@babel/preset-env"],
-  "ignore": [
-    "/node_modules/(?!@adobe|uuid)/"
-  ]
-} 
+  "ignore": [],
+  "include": ["node_modules/@adobe/alloy"]
+}
