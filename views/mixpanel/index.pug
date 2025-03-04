@@ -15,6 +15,15 @@ block content
                 button.btn.btn-warning.mt-3#btnPurchaseItem 
                     | Purchase an item
 block append-script
+    script(src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer)
+    script.
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+                appId: "392af5ee-c160-4bcd-af8d-c44da3987da6"
+            });
+        });
+
     script.
         $(() => {
             initSingularSdk();
