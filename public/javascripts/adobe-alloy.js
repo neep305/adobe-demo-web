@@ -66,17 +66,55 @@ function sendCustomEvent(eventType, pageName) {
             }
         }
     }).then(() => {
-        console.log(`[sendEvent] ${eventType} sent to Adobe`);
+        console.log(`[adobe-alloy] ${eventType} sent to Adobe`);
     });
 }
 
+/**
+ * Adobe Analytics 이벤트를 전송하는 함수
+ * @param {string} eventType - 이벤트 타입 (예: commerce.productViews)
+ * @param {object} eventData - 이벤트 데이터 (XDM 형식)
+ */
+function sendEvent(eventType, eventData) {
+    return alloy("sendEvent", {
+        xdm: {
+            eventType: eventType,
+            ...eventData.xdm
+        }
+    }).then(() => {
+        console.log(`[adobe-alloy] ${eventType} sent to Adobe`);
+    }).catch(error => {
+        console.error(`[adobe-alloy] Error sending ${eventType}:`, error);
+    });
+}
+
+/**
+ * ECID 반환
+ * https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/identity/overview
+ */
+function getECID() {
+    const ecid = alloy("getIdentity").then((result) => {
+        console.log("getECID result:", result);
+        const retrievedECID = result.identity.ECID;
+        console.log("retrievedECID:", retrievedECID);
+        return retrievedECID;
+    }).catch((error) => {
+        console.error("getECID error:", error);
+        return "No ECID found";
+    });
+    return ecid;
+}   
+
+/**
+ * 테스트 함수
+ */
 function alloyTest() {
     console.log("alloyTest");
 }
 
 window.__alloyCall = {
     configureAlloy: function(datastreamId, orgId) {
-        configureAlloy(datastreamId, orgId);
+        return configureAlloy(datastreamId, orgId);
     },
     sendCustomEvent: function(eventType, pageName) {
         sendCustomEvent(eventType, pageName);
@@ -84,7 +122,13 @@ window.__alloyCall = {
     sendPageView: function(pageName) {
         sendPageView(pageName);
     },
+    sendEvent: function(eventType, eventData) {
+        return sendEvent(eventType, eventData);
+    },
     alloyTest: function() {
         alloyTest();
+    },
+    getECID: function() {
+        return getECID();
     }
 }

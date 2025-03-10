@@ -1,0 +1,206 @@
+extends ../layout_default
+
+block content
+    div(style="margin:auto; margin-top: 56px;")
+        section.product-detail.container.mt-4
+            div.row
+                div.col-md-6
+                    img.img-fluid#productImage(src=product.imageUrl alt=product.name style="width: 100%; height: auto;")
+                div.col-md-6
+                    h2#productName.mb-3= product.name
+                    div.price.mb-3
+                        span.h3#productPrice ₩#{product.price.toLocaleString()}
+                    div.description.mb-4
+                        p#productDescription= product.description
+                    div.options.mb-4
+                        h5 색상
+                        div.color-options.d-flex.gap-2.justify-content-center
+                            each color in product.options.colors
+                                button.btn.btn-outline-dark.mr-2(class=color.value === 'black' ? 'active' : '' data-color=color.value)= color.label
+                    div.quantity.mb-4
+                        h5 수량
+                        div.d-flex.gap-2.justify-content-center
+                            div.input-group.w-50
+                                button.btn.btn-outline-dark#decreaseQuantity -
+                                input.form-control.text-center#quantity(type="number" value="1" min="1")
+                                button.btn.btn-outline-dark#increaseQuantity +
+                    div.actions
+                        button.btn.btn-danger.btn-lg.w-100.mb-2#addToCart 장바구니 담기
+                        button.btn.btn-outline-danger.btn-lg.w-100.mb-2#buyNow 바로 구매
+                div.col-md-12
+                    img.img-fluid#productDetailImage(src="https://dummyimage.com/600x600/e0e0e0/ffffff&text=Loading..." alt="Product Content Detail Image" style="width: 100%; height: auto;")
+
+block append-script
+    script.
+        $(() => {
+
+            // Adobe Alloy 설정
+            //- console.log(`[${location.pathname}] edgeConfigId: ${edgeConfigId}`);
+            //- console.log(`[${location.pathname}] orgId: ${orgId}`);
+            //- var edgeConfigId = "#{edgeConfigId}";
+            //- var orgId = "#{orgId}";
+
+            //- window.__alloyCall.configureAlloy(edgeConfigId, orgId);
+
+            // 상품 이미지 로드
+            const loadProductImage = () => {
+                const realImageUrl = 'https://1801889e95b1f9bf.kinxzone.com/webfile/product/9/9687/dqgh3ajf1vcv.jpg';  // 실제 이미지 URL
+                const img = new Image();
+                
+                img.onload = function() {
+                    $('#productImage').attr('src', realImageUrl);
+                };
+                
+                img.onerror = function() {
+                    console.error('Failed to load product image');
+                    $('#productImage').attr('src', 'https://dummyimage.com/600x600/e0e0e0/ffffff&text=No+Image');
+                };
+                
+                img.src = realImageUrl;
+            };
+            
+            const loadProductDetailImage = () => {
+                const realImageUrl = 'https://www.frisbeekorea.com/webfile/webedit/202312/20231201113446_0mybl1h02l.jpg';  // 실제 이미지 URL
+                const img = new Image();
+                
+                img.onload = function() {
+                    $('#productDetailImage').attr('src', realImageUrl);
+                };
+                
+                img.onerror = function() {
+                    console.error('Failed to load product detail image');
+                    $('#productDetailImage').attr('src', 'https://dummyimage.com/600x600/e0e0e0/ffffff&text=No+Image');
+                };
+                
+                img.src = realImageUrl;
+            };
+
+            // 페이지 로드 시 이미지 로드 시작
+            loadProductImage();
+            loadProductDetailImage();
+
+            // Adobe Alloy 설정
+            console.log('edgeConfigId', "#{edgeConfigId}");
+            console.log('orgId', "#{orgId}");
+            var edgeConfigId = "#{edgeConfigId}";
+            var orgId = "#{orgId}";
+
+            window.__alloyCall.configureAlloy(edgeConfigId, orgId);
+
+            // 수량 조절
+            $('#decreaseQuantity').on('click', () => {
+                let qty = parseInt($('#quantity').val());
+                if (qty > 1) $('#quantity').val(qty - 1);
+            });
+
+            $('#increaseQuantity').on('click', () => {
+                let qty = parseInt($('#quantity').val());
+                $('#quantity').val(qty + 1);
+            });
+
+            // 색상 선택
+            $('.color-options button').on('click', function() {
+                $('.color-options button').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            // 장바구니 담기
+            $('#addToCart').on('click', (e) => {
+                e.preventDefault();
+                const productData = {
+                    name: $('#productName').text(),
+                    price: $('#productPrice').text(),
+                    color: $('.color-options button.active').data('color'),
+                    quantity: parseInt($('#quantity').val())
+                };
+
+                window.__alloyCall.sendEvent('commerce.productListAdds', {
+                    xdm: {
+                        eventType: 'commerce.productListAdds',
+                        commerce: {
+                            cart: {
+                                cartID: 'cart123'
+                            },
+                            productListAdds: {
+                                value: 1
+                            }
+                        },
+                        productListItems: [{
+                            SKU: 'HDPH-001',
+                            name: productData.name,
+                            priceTotal: parseFloat(productData.price.replace(/[^0-9.-]+/g,"")),
+                            quantity: productData.quantity,
+                            selectedOptions: [{
+                                attribute: 'color',
+                                value: productData.color
+                            }]
+                        }]
+                    }
+                });
+                alert('장바구니에 추가되었습니다.');
+            });
+
+            // 바로 구매
+            $('#buyNow').on('click', (e) => {
+                e.preventDefault();
+                const productData = {
+                    name: $('#productName').text(),
+                    price: $('#productPrice').text(),
+                    color: $('.color-options button.active').data('color'),
+                    quantity: parseInt($('#quantity').val())
+                };
+
+                window.__alloyCall.sendEvent('commerce.purchases', {
+                    xdm: {
+                        eventType: 'commerce.purchases',
+                        commerce: {
+                            order: {
+                                purchaseID: 'order-' + Date.now(),
+                                currencyCode: 'KRW',
+                                priceTotal: parseFloat(productData.price.replace(/[^0-9.-]+/g,"")) * productData.quantity
+                            },
+                            purchases: {
+                                value: 1
+                            }
+                        },
+                        productListItems: [{
+                            SKU: 'HDPH-001',
+                            name: productData.name,
+                            priceTotal: parseFloat(productData.price.replace(/[^0-9.-]+/g,"")),
+                            quantity: productData.quantity,
+                            selectedOptions: [{
+                                attribute: 'color',
+                                value: productData.color
+                            }]
+                        }]
+                    }
+                });
+                alert('구매가 완료되었습니다.');
+            });
+
+            // 상품 조회 이벤트 전송 XDM 형식
+            window.__alloyCall.sendEvent('commerce.productViews', {
+                xdm: {
+                    eventType: 'commerce.productViews',
+                    commerce: {
+                        productViews: {
+                            value: 1
+                        }
+                    },
+                    productListItems: [{
+                        SKU: '#{product.id}',
+                        name: '#{product.name}',
+                        priceTotal: #{product.price},
+                        quantity: 1,
+                        selectedOptions: [{ attribute: 'color', value: 'black' }]
+                    }],
+                    web: {
+                        webPageDetails: {
+                            name: 'Product Detail',
+                            URL: window.location.href,
+                            isHomePage: false
+                        }
+                    }
+                }
+            });
+        });

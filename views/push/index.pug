@@ -1,0 +1,164 @@
+extends ../layout_default
+
+block content
+    // 로딩 오버레이
+    div#loadingOverlay.position-fixed.d-none(style="background: rgba(0,0,0,0.5); z-index: 9999; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center;")
+        div.text-center.text-white
+            div.spinner-border.text-light(role="status" style="width: 3rem; height: 3rem;")
+            div.mt-3.fw-bold 발송중...
+
+    // 토스트 메시지
+    div.position-fixed.top-0.end-0.p-4(style="z-index: 99999;")
+        div#pushToast.toast(role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000")
+            div.toast-header
+                i.fas.fa-bell.me-2.text-primary
+                strong.me-auto 푸시발송
+                //- button.btn-close(type="button" data-bs-dismiss="toast" aria-label="Close")
+            div.toast-body
+
+    h2.mt-2.text-primary 푸시 메시지 발송
+    .container.mt-2
+        .row
+            .col-md-8.offset-md-2
+                .card
+                    .card-body
+                        form#pushForm
+                            .form-group.mb-3
+                                label 푸시 타입
+                                select#pushType.form-control
+                                    option(value="notification") Notification (Foreground)
+                                    option(value="data") Data (Background)
+
+                            .form-group.mb-3
+                                label(for="title") 제목
+                                input#title.form-control(type="text" required)
+                            
+                            .form-group.mb-3
+                                label(for="body") 내용
+                                textarea#body.form-control(rows="3" required)
+                            
+                            .form-group.mb-3
+                                label(for="imageUrl") 이미지 URL (선택)
+                                input#imageUrl.form-control(type="url")
+                            
+                            .form-group.mb-3
+                                label(for="clickAction") 클릭 액션 URL
+                                input#clickAction.form-control(type="url" required)
+                            
+                            .form-group.mb-3#topicField(style="display:none")
+                                label(for="topic") 토픽명
+                                input#topic.form-control(type="text")
+                            
+                            .form-group.mb-3#tokenField(style="display:none")
+                                label(for="token") FCM 토큰
+                                input#token.form-control(type="text")
+                            
+                            .form-group.mb-3
+                                label 타겟 사용자
+                                select#targetType.form-control
+                                    option(value="all") 전체 사용자
+                                    option(value="topic") 특정 토픽 구독자
+                                    option(value="token") 특정 디바이스
+                            
+                            button.btn.btn-primary#sendPushBtn(type="button")
+                                span.button-text 발송하기
+
+block append-script
+    script.
+        $(() => {
+            const $loadingOverlay = $('#loadingOverlay');
+            const toastEl = document.getElementById('pushToast');
+            const toast = new bootstrap.Toast(toastEl);
+            
+            function showLoading() {
+                $loadingOverlay.removeClass('d-none');
+                $('#sendPushBtn').prop('disabled', true);
+            }
+            
+            function hideLoading() {
+                $loadingOverlay.addClass('d-none');
+                $('#sendPushBtn').prop('disabled', false);
+            }
+
+            function showToast(message, isSuccess = true) {
+                const $toast = $('#pushToast');
+                $toast.find('.toast-body').text(message)
+                      .removeClass('text-success text-danger')
+                      .addClass(isSuccess ? 'text-success' : 'text-danger');
+                $toast.find('.fa-bell')
+                      .removeClass('text-success text-danger')
+                      .addClass(isSuccess ? 'text-success' : 'text-danger');
+                toast.show();
+            }
+
+            $('#targetType').on('change', function() {
+                const selectedType = $(this).val();
+                
+                // 모든 조건부 필드 숨기기
+                $('#topicField, #tokenField').hide();
+                
+                // 선택된 타입에 따라 해당 필드 보여주기
+                if (selectedType === 'topic') {
+                    $('#topicField').show();
+                } else if (selectedType === 'token') {
+                    $('#tokenField').show();
+                }
+            });
+
+            $(document).ready(function() {
+                $('#title').val("#{title}");
+                $('#body').val("#{body}");
+                $('#imageUrl').val("#{imageUrl}");
+                $('#clickAction').val("#{clickAction}")
+
+                $('#sendPushBtn').on('click', function() {
+                    const formData = {
+                        title: $('#title').val(),
+                        body: $('#body').val(),
+                        imageUrl: $('#imageUrl').val(),
+                        clickAction: $('#clickAction').val(),
+                        pushType: $('#pushType').val(),
+                        targetType: $('#targetType').val(),
+                        topic: $('#topic').val(),
+                        token: $('#token').val()
+                    };
+
+                    showLoading();
+
+                    $.ajax({
+                        url: '/push/sendPush',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(formData),
+                        success: function(response) {
+                            hideLoading();
+                            if (response.success) {
+                                showToast('Push message sent successfully');
+                            } else {
+                                showToast('푸시 메시지 발송에 실패했습니다.', false);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            hideLoading();
+                            showToast('푸시 메시지 발송 중 오류가 발생했습니다: ' + error, false);
+                        }
+                    });
+                });
+
+                // select 변경 시 입력 필드 토글
+                $('#targetType').on('change', function() {
+                    const targetType = $(this).val();
+                    if (targetType === 'topic') {
+                        $('#topicField').show();
+                        $('#tokenField').hide();
+                    } else if (targetType === 'token') {
+                        $('#topicField').hide();
+                        $('#tokenField').show();
+                        $('#token').val("#{token}");
+                    } else {
+                        $('#topicField').hide();
+                        $('#tokenField').hide();
+                    }
+                });
+            });
+        });

@@ -1,0 +1,163 @@
+extends ../layout_default
+
+block content
+    div(style="margin:auto; margin-top: 56px;")
+        section.checkout.container.mt-4.py-4
+            h2.mb-4 주문/결제
+            
+            // 진행 상태 표시
+            div.progress.mb-5(style="height: 4px;")
+                div.progress-bar.bg-danger(style="width: 100%;" role="progressbar")
+            
+            div.row
+                div.col-md-8
+                    // 상품 목록
+                    div.card.mb-4.border-0.shadow-sm
+                        div.card-header.bg-danger
+                            h5.mb-0.text-white 주문 상품
+                        div.card-body
+                            each item in orderModel.orderItems
+                                div.row.align-items-center.mb-4.pb-3.border-bottom
+                                    div.col-2
+                                        img.img-fluid.rounded(src=item.imageUrl alt=item.name style="width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);")
+                                    div.col-4
+                                        h6.mb-1.fw-bold= item.name
+                                        small.text-muted.badge.bg-light.text-dark= item.color
+                                    div.col-2.text-center
+                                        span.badge.bg-light.text-dark= item.quantity + '개'
+                                    div.col-2.text-end
+                                        span.text-muted= '₩' + item.price.toLocaleString()
+                                    div.col-2.text-end
+                                        span.fw-bold= '₩' + (item.price * item.quantity).toLocaleString()
+            
+                    // 결제 수단
+                    div.card.mb-4.border-0.shadow-sm
+                        div.card-header.bg-danger
+                            h5.mb-0.text-white 결제 수단
+                        div.card-body
+                            div.form-check.mb-3
+                                input.form-check-input#paymentCard(type="radio" name="paymentMethod" value="card" checked)
+                                label.form-check-label(for="paymentCard")
+                                    i.fas.fa-credit-card.me-2.mr-1
+                                    span 신용카드
+                            div.form-check.mb-3
+                                input.form-check-input#paymentBank(type="radio" name="paymentMethod" value="bank")
+                                label.form-check-label(for="paymentBank")
+                                    i.fas.fa-university.me-2.mr-1
+                                    span 무통장입금
+                            div.form-check.mb-3
+                                input.form-check-input#paymentKakao(type="radio" name="paymentMethod" value="kakao")
+                                label.form-check-label(for="paymentKakao")
+                                    i.fas.fa-comment-dollar.me-2.mr-1
+                                    span 카카오페이
+                
+                div.col-md-4
+                    // 결제 정보
+                    div.card.mb-4.border-0.shadow-sm.sticky-top(style="top: 76px;")
+                        div.card-header.bg-danger
+                            h5.mb-0.text-white 결제 정보
+                        div.card-body
+                            div.row.mb-3
+                                div.col-6
+                                    h6.text-muted 상품 금액
+                                div.col-6.text-end
+                                    span= '₩' + orderModel.subtotal.toLocaleString()
+                            div.row.mb-3
+                                div.col-6
+                                    h6.text-muted 배송비
+                                div.col-6.text-end
+                                    span= '₩' + orderModel.shipping.toLocaleString()
+                            div.row.mb-3
+                                div.col-6
+                                    h6.text-muted 할인 금액
+                                div.col-6.text-end
+                                    span.text-danger= '-₩' + orderModel.discount.toLocaleString()
+                            div.row.mb-3
+                                div.col-6
+                                    h5.fw-bold 총 결제 금액
+                                div.col-6.text-end
+                                    h5.fw-bold.text-danger= '₩' + orderModel.total.toLocaleString()
+            
+            // 주문 완료 버튼
+            div.text-center.mb-5.mt-4
+                button.btn.btn-danger.btn-lg#completeOrder(style="width: 300px; padding: 15px 30px; font-size: 1.1rem;") 
+                    span 주문 완료하기
+
+block append-script
+    script.
+        // 서버에서 전달된 데이터를 JavaScript 변수로 설정
+        const orderModel = !{JSON.stringify(orderModel)};
+        
+        $(() => {
+            window.__alloyCall.configureAlloy('#{edgeConfigId}', '#{orgId}')
+            .then(() => {
+                console.log('Adobe Alloy 설정 완료');
+
+                // Checkout 페이지 로드 시 이벤트 전송
+                window.__alloyCall.sendEvent('commerce.checkout', {
+                    xdm: {
+                        eventType: 'commerce.checkout',
+                        commerce: {
+                            checkout: {
+                                currencyCode: 'KRW',
+                                priceTotal: orderModel.total
+                            }
+                        },
+                        productListItems: orderModel.orderItems.map(item => ({
+                            SKU: item.id,
+                            name: item.name,
+                            priceTotal: item.price,
+                            quantity: item.quantity,
+                            selectedOptions: [{ 
+                                attribute: 'color',
+                                value: item.color
+                            }]
+                        })),
+                        web: {
+                            webPageDetails: {
+                                name: 'Checkout',
+                                URL: window.location.href,
+                                isHomePage: false
+                            }
+                        }
+                    }
+                });
+            }).catch(error => {
+                console.error('Adobe Alloy 설정 오류:', error);
+            });
+
+            // 주문 완료 버튼 클릭
+            $('#completeOrder').on('click', (e) => {
+                e.preventDefault();
+                const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+            
+                // Adobe Analytics 이벤트 전송
+                window.__alloyCall.sendEvent('commerce.purchases', {
+                    xdm: {
+                        eventType: 'commerce.purchases',
+                        commerce: {
+                            order: {
+                                purchaseID: 'order-' + Date.now(),
+                                currencyCode: 'KRW',
+                                priceTotal: orderModel.total
+                            },
+                            purchases: {
+                                value: 1
+                            }
+                        },
+                        productListItems: orderModel.orderItems.map(item => ({
+                            SKU: item.id,
+                            name: item.name,
+                            priceTotal: item.price,
+                            quantity: item.quantity,
+                            selectedOptions: [{
+                                attribute: 'color',
+                                value: item.color
+                            }]
+                        }))
+                    }
+                });
+                console.log('Adobe Analytics 이벤트 전송 완료');
+                window.location.href = '/checkout/order_complete';
+            });
+        });

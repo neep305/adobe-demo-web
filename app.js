@@ -3,14 +3,23 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const admin = require('firebase-admin');
+const serviceAccount = require('./config/adobe-demo-app-service-key.json'); // 서비스 계정 키 파일 위치 조정
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var postbackRouter = require('./routes/postback');
 var mixpanelRouter = require('./routes/mixpanel');
 var encryptRouter = require('./routes/encrypt');
-
+var productRouter = require('./routes/product');
+var checkoutRouter = require('./routes/checkout');
+var pushRouter = require('./routes/push');
 var app = express();
+
+// Firebase Admin SDK 초기화
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -33,6 +42,9 @@ app.use('/users', usersRouter);
 app.use('/postback', postbackRouter);
 app.use('/mixpanel', mixpanelRouter);
 app.use('/encrypt', encryptRouter);
+app.use('/product', productRouter);
+app.use('/checkout', checkoutRouter);
+app.use('/push', pushRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

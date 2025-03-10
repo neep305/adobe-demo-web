@@ -7,7 +7,13 @@ html
     title= title
     link(href='/static/bootstrap/dist/css/bootstrap.min.css', rel='stylesheet', integrity='sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T', crossorigin='anonymous')
     link(href='/static/font-awesome/css/font-awesome.min.css', rel='stylesheet')
-    
+    script(src="https://assets.adobedtm.com/5457a4304afb/eddee741a39a/launch-215efecdb576-development.min.js" async)
+    script.
+      !function(e,a,n,t){var i=e.head;if(i){
+      if (a) return;
+      var o=e.createElement("style");
+      o.id="alloy-prehiding",o.innerText=n,i.appendChild(o),setTimeout(function(){o.parentNode&&o.parentNode.removeChild(o)},t)}}
+      (document, document.location.href.indexOf("adobe_authoring_enabled") !== -1, ".personalization-container { opacity: 0 !important }", 3000);
   body.vh-100.m-0.d-flex.flex-column.text-center
     header 
       .navbar.navbar-dark.bg-danger.shadow-sm
@@ -26,20 +32,13 @@ html
                 a.nav-link(href="/") Home 
                   span.sr-only (current)
               li.nav-item
-                a.nav-link(href="/webtoapp") Web To App
-              li.nav-item
+                a.nav-link(href="/target") Target
                 a.nav-link(href="/gtm") GTM Singular Event
-              li.nav-item
-                a.nav-link(href="/events") JS Interface Test
-              li.nav-item
-                a.nav-link(href="/bridge") Bridge
-              li.nav-item
                 a.nav-link(href="/ga") GA4
               li.nav-item
                 a.nav-link(href="/mixpanel") Mixpanel
     block content
-      //div.container-fluid.d-flex.flex-column
-        //block content
+      
     footer.footer.py-3.bg-danger.mt-auto
       .container
         a.text-white.float-right(href='#') Back to top

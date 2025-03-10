@@ -30,7 +30,16 @@ block append-script
       var edgeConfigId = "#{edgeConfigId}";
       var orgId = "#{orgId}";
 
-      window.__alloyCall.configureAlloy(edgeConfigId, orgId);
+      window.__alloyCall.configureAlloy(edgeConfigId, orgId).then(() => {
+        console.log("configureAlloy success");
+        window.__alloyCall.getECID().then((ecid) => {
+          console.log("ecid:", ecid);
+          $('#customUserIdField').val(ecid).prop('disabled', true);
+        });
+      }).catch((error) => {
+        console.error("configureAlloy error:", error);
+      });
+
       // Send Event
       $('#btnSendEvent').on('click', (e) => {
         e.preventDefault();
