@@ -160,3 +160,5 @@ coverage/
 
 # Compiled JavaScript files
 *.js.map
+
+./config/adobe-demo-app-service-key.json
