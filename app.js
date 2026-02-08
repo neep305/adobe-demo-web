@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const admin = require('firebase-admin');
-const serviceAccount = require('./config/adobe-demo-app-service-key.json'); // 서비스 계정 키 파일 위치 조정
+const fs = require('fs');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -17,9 +17,33 @@ var pushRouter = require('./routes/push');
 var app = express();
 
 // Firebase Admin SDK 초기화
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-});
+// Heroku 환경에서는 환경 변수를 사용하고, 로컬에서는 서비스 키 파일을 사용
+let firebaseConfig;
+
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    // Heroku 환경: 환경 변수에서 JSON 파싱
+    try {
+        firebaseConfig = {
+            credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))
+        };
+        console.log('Firebase: 환경 변수로 초기화');
+    } catch (error) {
+        console.error('Firebase 환경 변수 파싱 에러:', error);
+    }
+} else if (fs.existsSync('./config/adobe-demo-app-service-key.json')) {
+    // 로컬 환경: 서비스 키 파일 사용
+    const serviceAccount = require('./config/adobe-demo-app-service-key.json');
+    firebaseConfig = {
+        credential: admin.credential.cert(serviceAccount)
+    };
+    console.log('Firebase: 로컬 서비스 키 파일로 초기화');
+} else {
+    console.warn('Firebase 초기화 실패: 환경 변수나 서비스 키 파일이 없습니다.');
+}
+
+if (firebaseConfig) {
+    admin.initializeApp(firebaseConfig);
+}
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
